@@ -6,3 +6,4 @@ editor: visual
 format:
   revealjs:
     theme: [default, custom-fonts.scss]
+    footer: "Pure Mediation | Uriah Finkel | slide <span class='slide-number'></span>"
