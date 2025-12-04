@@ -1,0 +1,390 @@
+---
+title: "Pure Mediation"
+author: "Uriah Finkel"
+format: revealjs
+---
+
+## Causal Assumption {.smaller}
+
+```{r}
+#| echo: false
+
+library(reactable)
+library(dplyr)
+```
+
+::::: columns
+::: {.column width="50%"}
+Smoking 🚬 might cause COPD 🫁 only by increasing TAR ⚫ levels in the lungs.
+:::
+
+::: {.column width="50%"}
+:::
+:::::
+
+## Why Mediation is Challenging? {.smaller}
+
+::::: columns
+::: {.column width="30%"}
+![](causal_conventional.png)
+:::
+
+::: {.column width="70%"}
+-   Most conventional causal questions explore two possible worlds, with a treatment assigned to A=0 or A=1.
+:::
+:::::
+
+## Why Mediation is Challenging? {.smaller}
+
+::::: columns
+::: {.column width="30%"}
+![](causal_mediation.png)
+:::
+
+::: {.column width="70%"}
+-   Most conventional causal questions explore two possible worlds, with a treatment assigned to A=0 or A=1.
+
+-   Mediation concerns each combination of the original treatment A=0, A=1 with the mediation variable M=0, M=1.
+:::
+:::::
+
+## Why Mediation is Challenging? {.smaller}
+
+::::: columns
+::: {.column width="30%"}
+![](controlled_direct_effect.png)
+:::
+
+::: {.column width="70%"}
+-   Most conventional causal questions explore two possible worlds, with a treatment assigned to A=0 or A=1.
+
+-   Mediation concerns each combination of the original treatment A=0, A=1 with the mediation variable M=0, M=1.
+
+-   Controlling both treatment and mediation variables might feel unnatural:
+
+$CDE(m) = Y | [do(a=1),do(m)] - Y|do[a=0,do(m)]$
+:::
+:::::
+
+## Why Mediation is Challenging? {.smaller}
+
+::::: columns
+::: {.column width="30%"}
+![](do_m.png)
+:::
+
+::: {.column width="70%"}
+-   Most conventional causal questions explore two possible worlds, with a treatment assigned to A=0 or A=1.
+
+-   Mediation concerns each combination of the original treatment A=0, A=1 with the mediation variable M=0, M=1.
+
+-   Controlling both treatment and mediation variables might feel unnatural:
+
+$CDE(m) = Y | [do(a=1),do(m)] - Y|do[a=0,do(m)]$
+
+-   If that's not weird enough, most M interventions are not well-defined. If Smoking (A) leads to TAR (M) that leads to (Y): How can we manipulate TAR independently? We might think of little people that clean TAR from our lungs (M=0) or adding TAR to our lungs (M=1).
+:::
+:::::
+
+## Why Mediation is Helpful? {.smaller}
+
+::::: columns
+::: {.column width="30%"}
+![](benefit_mediation.png)
+:::
+
+::: {.column width="70%"}
+$CDE(m) = Y | [do(a=1),do(m)] - Y|do[a=0,do(m)]$
+
+Mediation put us closer to "How Nature Works". By making our causal paths more explicit, we make our narrative closer to the domain expertise. Smoking makes COPD, is not as clear as Smoking makes COPD by increasing TAR in the lungs.
+
+Pure mediation puts the boundaries around the possible causal paths.
+:::
+:::::
+
+## CDE under Pure Mediation {.smaller}
+
+::::: columns
+::: {.column width="30%"}
+![](controlled_direct_effect.png)
+:::
+
+::: {.column width="70%"}
+$CDE(m) = Y | [do(a=1),do(m)] - Y|[do(a=0),do(m)]]$
+
+-   CDE under Pure mediation blocks all the harm made by cigarettes.
+:::
+:::::
+
+## CDE under Pure Mediation {.smaller}
+
+::::: columns
+::: {.column width="30%"}
+![](cde_0.png)
+:::
+
+::: {.column width="70%"}
+$CDE(m) = Y | [do(a=1),do(m)] - Y|[do(a=0),do(m)]]$
+
+-   CDE under Pure mediation blocks all the harm made by cigarettes.
+
+-   If a small person cleans up all the TAR from the lungs, Smoking won't cause COPD.
+:::
+:::::
+
+## CDE under Pure Mediation {.smaller}
+
+::::: columns
+::: {.column width="30%"}
+![](cde_1.png)
+:::
+
+::: {.column width="70%"}
+$CDE(m) = Y | [do(a=1),do(m)] - Y|[do(a=0),do(m)]]$
+
+-   CDE under Pure mediation blocks all the harm made by cigarettes.
+
+-   If a small person cleans up all the TAR from the lungs, Smoking won't cause COPD.
+
+-   If a small person puts TAR in the lungs, Avoiding Smoking won't prevent COPD.
+:::
+:::::
+
+## NDE under Pure Mediation {.smaller}
+
+::::: columns
+::: {.column width="30%"}
+![](nde.png)
+:::
+
+::: {.column width="70%"}
+$NDE = Y|[do(a=1),do(M|do(a=0))] - Y|[do(a=0),do(M|do(a=0))]$
+
+-   NDE under Pure mediation also blocks all the harm made by cigarettes by setting the Mediator to the potential outcome that would have been if the patient didn't smoke, while comparing Smoking vs Non-smoking scenario with the manipulated M values.
+:::
+:::::
+
+## NDE under Pure Mediation {.smaller}
+
+::::: columns
+::: {.column width="30%"}
+![](nde.png)
+:::
+
+::: {.column width="70%"}
+$NDE = Y|[do(M|do(a=0))] - Y|[do(M|do(a=0))] = 0$
+
+-   NDE under Pure mediation also blocks all the harm made by cigarettes by setting the Mediator to the potential outcome that would have been if the patient didn't smoke, while comparing Smoking vs Non-smoking scenario with the manipulated M values.
+
+-   Under pure mediation, once we know the value of the mediator M the original treatment A value does not matter. It might be challenging to think about the Natural Direct Effect, but just keep in mind that once we manipulate the TAR (M) under pure mediation it does not matter if the patient smoked or didn't smoke.
+:::
+:::::
+
+## NIE under Pure Mediation {.smaller}
+
+::::: columns
+::: {.column width="30%"}
+![](nde.png)
+
+![](nie.png)
+:::
+
+::: {.column width="70%"}
+$NIE = Y|[do(a=0),do(M|do(a=1)] - Y|do(a=0),do(M=0)$
+
+-   NIE under Pure mediation contains all the harm made by cigarettes by artificially manipulating the TAR (Mediator) values to the values that would have been if smoking or if not smoking.
+:::
+:::::
+
+## NIE under Pure Mediation {.smaller}
+
+::::: columns
+::: {.column width="30%"}
+![](nde.png)
+
+![](nie.png)
+:::
+
+::: {.column width="70%"}
+$NIE = Y|[do(M|do(a=1))] - Y|[do(M|do(a=0))]$
+
+-   NIE under Pure mediation contains all the harm made by cigarettes by artificially manipulating the TAR (Mediator) values to the values that would have been if smoking or if not smoking.
+
+-   Again, the original treatment assignment A becomes irrelevant.
+:::
+:::::
+
+## NIE under Pure Mediation {.smaller}
+
+::::: columns
+::: {.column width="30%"}
+![](nde.png)
+
+![](nie.png)
+:::
+
+::: {.column width="70%"}
+$NIE = Y|do(a=1) - Y|do(a=0) = TE$
+
+-   NIE under Pure mediation contains all the harm made by cigarettes by artificially manipulating the TAR (Mediator) values to the values that would have been if smoking or if not smoking.
+
+-   Again, the original treatment assignment A becomes irrelevant.
+
+-   Finally, we get the Total Effect that is being mediated from the treatment to the outcome.
+:::
+:::::
+
+## {.smaller}
+
+::::: columns
+::: {.column width="45%"}
+
+```{r}
+countefactual_data <- tibble::tribble(
+   ~"X", ~"A", ~"Y_a0", ~"Y_a1", ~"M_a0", ~"M_a1", ~"Y_m0", ~"Y_m1",
+   "0", "1", "0", "1", "0", "1", "0", "1",
+   "0", "1", "0", "0", "0", "0", "0", "0",
+   "0", "0", "1", "1", "1", "1", "1", "1",
+   "0", "0", "0", "1", "0", "1", "0", "1",
+   "0", "0", "0", "0", "0", "0", "0", "0",
+   "0", "0", "0", "0", "0", "0", "0", "0", 
+   "1", "1", "1", "1", "1", "1", "0", "1", 
+   "1", "1", "1", "1", "1", "1", "0", "1",
+   "1", "1", "1", "1", "1", "1", "0", "1",
+   "1", "1", "1", "1", "0", "0", "1", "1",
+   "1", "1", "1", "1", "1", "1", "1", "1",
+   "1", "1", "0", "1", "0", "1", "0", "1",
+   "1", "1", "0", "0", "0", "0", "0", "1",
+   "1", "1", "0", "0", "0", "0", "0", "0",
+   "1", "0", "1", "1", "1", "1", "0", "1",
+   "1", "0", "0", "1", "0", "1", "0", "1"
+  ) |> 
+  mutate(
+    observed_y = case_when(
+      A == "0" ~ Y_a0,
+      A == "1" ~ Y_a1
+    ),
+    ITE = as.numeric(Y_a1) - as.numeric(Y_a0)
+  ) |> 
+  arrange(
+    A, observed_y, X
+  ) |> 
+  select(X, A, M_a0, M_a1, Y_m0, Y_m1, Y_a0, Y_a1, ITE) |> 
+  mutate(
+    observed_m = case_when(
+      A == "0" ~ M_a0,
+      A == "1" ~ M_a1
+    ),
+    observed_y = case_when(
+      A == "0" ~ Y_a0,
+      A == "1" ~ Y_a1
+    )
+  ) |> 
+  arrange(
+    A, observed_y, X
+  )
+
+countefactual_data_reactable_raw <- countefactual_data |> 
+  reactable(
+    theme = reactableTheme(
+      backgroundColor = "#F5F2EB",
+      tableStyle = list(
+        backgroundColor = "#F5F2EB"
+      ),
+      headerStyle = list(
+        backgroundColor = "#F5F2EB"
+      ),
+      cellStyle = list(
+        backgroundColor = "#F5F2EB"
+      )),
+  sortable = FALSE,
+  defaultPageSize = 19,
+  columns = list(
+    observed_y = colDef(
+      show = FALSE
+    ),
+    observed_m = colDef(
+      show = FALSE
+    ),
+    ITE = colDef(
+      style = function(value) {
+      if(value == "1")
+      list(background = "pink")
+    }
+    ),
+    Y_a0 = colDef(
+      name = "Y<sup>A0",
+      html = TRUE,
+      style = function(value) {
+      if(value == "1")
+      list(background = "pink")
+    }
+    ),
+    M_a1 = colDef(
+      name = "M<sup>A1",
+      html = TRUE,
+      style = function(value) {
+      if(value == "1")
+      list(background = "lightgray")
+    }
+    ),
+    M_a0 = colDef(
+      name = "M<sup>A0",
+      html = TRUE,
+      style = function(value) {
+      if(value == "1")
+      list(background = "lightgray")
+    }
+    ),
+    Y_a1 = colDef(
+      name = "Y<sup>A1",
+      html = TRUE,
+      style = function(value) {
+      if(value == "1")
+      list(background = "pink")
+    }
+    ),
+    Y_m0 = colDef(
+      name = "Y<sup>M0",
+      html = TRUE,
+      style = function(value) {
+      if(value == "1")
+      list(background = "#E6D7FF")
+    }
+    ),
+    Y_m1 = colDef(
+      name = "Y<sup>M1",
+      html = TRUE,
+      style = function(value) {
+      if(value == "1")
+      list(background = "#E6D7FF")
+    }
+    )
+  ),
+  defaultColDef = colDef(maxWidth = 50),
+  style = list(fontSize = "1rem"))
+
+
+countefactual_data_reactable_raw
+
+```
+
+:::
+
+::: {.column width="55%"}
+
+#### 😇 God-Given Counterfactual Data
+
+Let's calculate NIE:
+
+###### Setting do(A=1)
+$$Y|[do(M|do(A=1))]$$
+- We take the counterfactual M values for A=1
+
+- And the corresponding counterfactual Y values
+
+
+:::
+
+
+:::::

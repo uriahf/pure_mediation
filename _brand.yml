@@ -1,0 +1,12 @@
+color:
+  palette:
+    cream:   "#F5F2EB"
+    blue:    "#0077C0"
+    navy:    "#001F3F"
+    coral:   "#E05122"
+    mustard: "#F2B700"
+  background: cream
+  foreground: navy
+  primary: blue
+  secondary: navy
+  link: mustard

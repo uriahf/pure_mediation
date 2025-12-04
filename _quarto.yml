@@ -1,0 +1,8 @@
+project:
+  title: "pure_mediation"
+
+editor: visual
+
+format:
+  revealjs:
+    theme: [default, custom-fonts.scss]
