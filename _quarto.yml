@@ -1,7 +1,12 @@
 project:
+  type: website
   title: "pure_mediation"
-
-editor: visual
+  output-dir: _site
+  resources:
+    - fonts
+    
+website:
+  site-url: https://puremediation.netlify.app
 
 format:
   revealjs:

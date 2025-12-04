@@ -1,4 +1,4 @@
-- source: pure_mediation.qmd
+- source: project
   netlify:
     - id: 7b0af05c-ac28-4f76-ad21-3f3880bf2535
       url: https://puremediation.netlify.app

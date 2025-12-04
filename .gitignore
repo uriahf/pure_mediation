@@ -6,3 +6,4 @@
 **/*.quarto_ipynb
 pure_mediation.html
 pure_mediation_files
+_site
