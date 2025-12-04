@@ -14,11 +14,11 @@ library(dplyr)
 ```
 
 
-Pure Mediation means that the effect of the treatment A on outcome Y is mediated only through the Mediator M.
+Pure mediation means that the effect of treatment A on outcome Y is transmitted only through the mediator M.
 
 Smoking 🚬 might cause COPD 🫁 only by increasing TAR ⚫ levels in the lungs.
 
-## Why Mediation is Challenging? {.smaller}
+## Why Is Mediation Challenging? {.smaller}
 
 ::::: columns
 ::: {.column width="30%"}
@@ -30,7 +30,7 @@ Smoking 🚬 might cause COPD 🫁 only by increasing TAR ⚫ levels in the lung
 :::
 :::::
 
-## Why Mediation is Challenging? {.smaller}
+## Why Is Mediation Challenging? {.smaller}
 
 ::::: columns
 ::: {.column width="30%"}
@@ -40,11 +40,11 @@ Smoking 🚬 might cause COPD 🫁 only by increasing TAR ⚫ levels in the lung
 ::: {.column width="70%"}
 -   Most conventional causal questions explore two possible worlds, with a treatment assigned to A=0 or A=1.
 
--   Mediation concerns each combination of the original treatment A=0, A=1 with the mediation variable M=0, M=1.
+-   Mediation involves each combination of the original treatment (A=0, A=1) with the mediator levels (M=0, M=1).
 :::
 :::::
 
-## Why Mediation is Challenging? {.smaller}
+## Why Is Mediation Challenging? {.smaller}
 
 ::::: columns
 ::: {.column width="30%"}
@@ -54,15 +54,15 @@ Smoking 🚬 might cause COPD 🫁 only by increasing TAR ⚫ levels in the lung
 ::: {.column width="70%"}
 -   Most conventional causal questions explore two possible worlds, with a treatment assigned to A=0 or A=1.
 
--   Mediation concerns each combination of the original treatment A=0, A=1 with the mediation variable M=0, M=1.
+-   Mediation involves each combination of the original treatment (A=0, A=1) with the mediator levels (M=0, M=1).
 
--   Controlling both treatment and mediation variables might feel unnatural:
+-   Controlling both the treatment and the mediator may feel unnatural:
 
 $CDE(m) = Y | [do(A=1),do(m)] - Y|[do(A=0),do(m)]$
 :::
 :::::
 
-## Why Mediation is Challenging? {.smaller}
+## Why Is Mediation Challenging? {.smaller}
 
 ::::: columns
 ::: {.column width="30%"}
@@ -72,17 +72,17 @@ $CDE(m) = Y | [do(A=1),do(m)] - Y|[do(A=0),do(m)]$
 ::: {.column width="70%"}
 -   Most conventional causal questions explore two possible worlds, with a treatment assigned to A=0 or A=1.
 
--   Mediation concerns each combination of the original treatment A=0, A=1 with the mediation variable M=0, M=1.
+-   Mediation involves each combination of the original treatment (A=0, A=1) with the mediator levels (M=0, M=1).
 
--   Controlling both treatment and mediation variables might feel unnatural:
+-   Controlling both the treatment and the mediator may feel unnatural:
 
 $CDE(m) = Y | [do(A=1),do(m)] - Y|[do(A=0),do(m)]$
 
--   If that's not weird enough, most M interventions are not well-defined. If Smoking (A) leads to TAR (M) that leads to (Y): How can we manipulate TAR independently? We might think of little people that clean TAR from our lungs (M=0) or adding TAR to our lungs (M=1).
+-   If that is not strange enough, most mediator interventions are not well defined. If smoking (A) leads to TAR (M) which leads to COPD (Y), how can we manipulate TAR independently? One might imagine small creatures cleaning TAR from the lungs (M=0) or adding TAR (M=1).
 :::
 :::::
 
-## Why Mediation is Helpful? {.smaller}
+## Why Is Mediation Helpful? {.smaller}
 
 ::::: columns
 ::: {.column width="30%"}
@@ -92,9 +92,9 @@ $CDE(m) = Y | [do(A=1),do(m)] - Y|[do(A=0),do(m)]$
 ::: {.column width="70%"}
 $CDE(m) = Y | [do(A=1),do(m)] - Y|[do(A=0),do(m)]$
 
-Mediation put us closer to "How Nature Works". By making our causal paths more explicit, we make our narrative closer to the domain expertise. Smoking makes COPD, is not as clear as Smoking makes COPD by increasing TAR in the lungs.
+Mediation moves us closer to "how nature works" by making causal paths explicit, our narrative becomes more aligned with domain expertise. "Smoking causes COPD" is less informative than "Smoking causes COPD by increasing TAR in the lungs".
 
-Pure mediation puts the boundaries around the possible causal paths.
+Pure mediation sets clear boundaries on which causal paths are allowed.
 :::
 :::::
 
@@ -108,11 +108,11 @@ Pure mediation puts the boundaries around the possible causal paths.
 ::: {.column width="70%"}
 $CDE(m) = Y | [do(A=1),do(m)] - Y|[do(A=0),do(m)]$
 
-Assuming Pure Mediation:
+Assuming pure mediation:
 
 $CDE(m) = Y |do(m) - Y|do(m) = 0$
 
--   CDE under Pure mediation blocks all the harm made by cigarettes.
+- Under pure mediation, a controlled direct effect of zero means that all harm from cigarettes is blocked once we fix TAR.
 :::
 :::::
 
@@ -130,9 +130,9 @@ Assuming Pure Mediation:
 
 $CDE(M=0) = Y |do(M=0) - Y|do(M=0) = 0$
 
--   CDE under Pure mediation blocks all the harm made by cigarettes.
+- Under pure mediation, a controlled direct effect of zero means that all harm from cigarettes is blocked once we fix TAR.
 
--   If a small person cleans up all the TAR from the lungs, Smoking won't cause COPD.
+-   If a small creature cleaned all the TAR from the lungs, smoking would not cause COPD.
 :::
 :::::
 
@@ -150,11 +150,11 @@ Assuming Pure Mediation:
 
 $CDE(M=1) = Y |do(M=1) - Y|do(M=1) = 0$
 
--   CDE under Pure mediation blocks all the harm made by cigarettes.
+- Under pure mediation, a controlled direct effect of zero means that all harm from cigarettes is blocked once we fix TAR.
 
--   If a small person cleans up all the TAR from the lungs, Smoking won't cause COPD.
+-   If a small creature cleaned all the TAR from the lungs, smoking would not cause COPD.
 
--   If a small person puts TAR in the lungs, Avoiding Smoking won't prevent COPD.
+-   If a small creature added TAR to the lungs, avoiding smoking would not prevent COPD.
 :::
 :::::
 
@@ -166,9 +166,9 @@ $CDE(M=1) = Y |do(M=1) - Y|do(M=1) = 0$
 :::
 
 ::: {.column width="70%"}
-$NDE = Y|[do(a=1),do(M|do(a=0))] - Y|[do(a=0),do(M|do(a=0))]$
+$NDE = Y|[do(A=1),do(M|do(A=0))] - Y|[do(A=0),do(M|do(A=0))]$
 
--   NDE under Pure mediation also blocks all the harm made by cigarettes by setting the Mediator to the potential outcome that would have been if the patient didn't smoke, while comparing Smoking vs Non-smoking scenario with the manipulated M values.
+-   Under pure mediation, the NDE blocks all the harm caused by cigarettes by setting the mediator to the value it would take under no smoking, while comparing smoking versus non-smoking with this manipulated M.
 :::
 :::::
 
@@ -182,9 +182,9 @@ $NDE = Y|[do(a=1),do(M|do(a=0))] - Y|[do(a=0),do(M|do(a=0))]$
 ::: {.column width="70%"}
 $NDE = Y|[do(M|do(A=0))] - Y|[do(M|do(A=0))] = 0$
 
--   NDE under Pure mediation also blocks all the harm made by cigarettes by setting the Mediator to the potential outcome that would have been if the patient didn't smoke, while comparing Smoking vs Non-smoking scenario with the manipulated M values.
+-   Under pure mediation, the NDE blocks all the harm caused by cigarettes by setting the mediator to the value it would take under no smoking, while comparing smoking versus non-smoking with this manipulated M.
 
--   Under pure mediation, once we know the value of the mediator M the original treatment A value does not matter. It might be challenging to think about the Natural Direct Effect, but just keep in mind that once we manipulate the TAR (M) under pure mediation it does not matter if the patient smoked or didn't smoke.
+-   Under pure mediation, once we know the value of the mediator M, the original treatment A no longer matters. The natural direct effect may feel abstract, but once TAR (M) is fixed, it does not matter whether the patient actually smoked.
 :::
 :::::
 
@@ -200,7 +200,7 @@ $NDE = Y|[do(M|do(A=0))] - Y|[do(M|do(A=0))] = 0$
 ::: {.column width="70%"}
 $NIE = Y|[do(A=0),do(M|do(A=1)] - Y|[do(A=0),do(M|do(A=0)]$
 
--   NIE under Pure mediation contains all the harm made by cigarettes by artificially manipulating the TAR (Mediator) values to the values that would have been if smoking or if not smoking.
+-   Under pure mediation, the NIE captures all the harm caused by cigarettes by manipulating TAR (the mediator) to the values it would take under smoking versus not smoking.
 :::
 :::::
 
@@ -216,7 +216,7 @@ $NIE = Y|[do(A=0),do(M|do(A=1)] - Y|[do(A=0),do(M|do(A=0)]$
 ::: {.column width="70%"}
 $NIE = Y|[do(M|do(A=1))] - Y|[do(M|do(A=0))]$
 
--   NIE under Pure mediation contains all the harm made by cigarettes by artificially manipulating the TAR (Mediator) values to the values that would have been if smoking or if not smoking.
+-   Under pure mediation, the NIE captures all the harm caused by cigarettes by manipulating TAR (the mediator) to the values it would take under smoking versus not smoking.
 
 -   Again, the original treatment assignment A becomes irrelevant.
 :::
@@ -553,7 +553,7 @@ countefactual_data_reactable_raw
 
 We can now explore how the components of the Natural Indirect Effect:
 
-$$Y|[do(M|do(a=0))] = Y|do(A=0)$$
+$$Y|[do(M|do(A=0))] = Y|do(A=0)$$
 
 ![](nde.png)
 
@@ -755,7 +755,7 @@ countefactual_data_reactable_raw
 
 We can now explore how the components of the Natural Indirect Effect:
 
-$$Y|[do(M|do(a=1))] = Y|do(A=1)$$
+$$Y|[do(M|do(A=1))] = Y|do(A=1)$$
 
 ![](nie.png)
 :::
@@ -772,9 +772,9 @@ $$Y|[do(M|do(a=1))] = Y|do(A=1)$$
 :::
 
 ::: {.column width="70%"}
-$NIE = Y|do(a=1) - Y|do(a=0) = TE$
+$NIE = Y|do(A=1) - Y|do(A=0) = TE$
 
-Finally, we can see that the Natural Indirect Effect is equal to the Total Effect that is being mediated from the treatment to the outcome in case of pure mediation.
+Finally, we see that the Natural Indirect Effect equals the Total Effect, because under pure mediation the entire effect of the treatment on the outcome is transmitted through the mediator.
 
 :::
 :::::
@@ -786,8 +786,8 @@ Finally, we can see that the Natural Indirect Effect is equal to the Total Effec
 {{< video https://youtu.be/e1a5Ftdd8Xw width="50%" height="42.5%" >}}
 
 
-The images in this presentation are highly inspired by the wonderful French TV-Series: "Il était une fois… la Vie".
+The images in this presentation are highly inspired by the wonderful French TV Series: "Il était une fois… la Vie".
 
-Every time I think about unintuitive mediators in healthcare, I remember how this educational animated TV series helped me understand complicated material.
+Whenever I think about unintuitive mediators in healthcare, I remember how this educational animated series helped me understand complex concepts.
 
-And also in [English](https://www.youtube.com/watch?v=sn3tBnb4Nck) and [Hebrew](https://www.youtube.com/watch?v=sn3tBnb4Nck)
+And also in [English](https://www.youtube.com/watch?v=sn3tBnb4Nck) and [Hebrew](https://www.youtube.com/watch?v=LrnYAMVUVjA)
