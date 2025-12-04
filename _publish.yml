@@ -1,4 +1,4 @@
 - source: pure_mediation.qmd
   netlify:
     - id: 7b0af05c-ac28-4f76-ad21-3f3880bf2535
-      url: https://serene-pavlova-964278.netlify.app
+      url: https://puremediation.netlify.app
