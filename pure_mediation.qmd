@@ -4,7 +4,7 @@ author: "Uriah Finkel"
 format: revealjs
 ---
 
-## Causal Assumption {.smaller}
+## Causal Assumption
 
 ```{r}
 #| echo: false
@@ -13,14 +13,10 @@ library(reactable)
 library(dplyr)
 ```
 
-::::: columns
-::: {.column width="50%"}
-Smoking 🚬 might cause COPD 🫁 only by increasing TAR ⚫ levels in the lungs.
-:::
 
-::: {.column width="50%"}
-:::
-:::::
+Pure Mediation means that the effect of the treatment A on outcome Y is mediated only through the Mediator M.
+
+Smoking 🚬 might cause COPD 🫁 only by increasing TAR ⚫ levels in the lungs.
 
 ## Why Mediation is Challenging? {.smaller}
 
@@ -190,7 +186,7 @@ $NDE = Y|[do(M|do(a=0))] - Y|[do(M|do(a=0))] = 0$
 :::
 
 ::: {.column width="70%"}
-$NIE = Y|[do(a=0),do(M|do(a=1)] - Y|do(a=0),do(M=0)$
+$NIE = Y|[do(a=0),do(M|do(a=1)] - Y|[do(a=0),do(M|do(a=0)]$
 
 -   NIE under Pure mediation contains all the harm made by cigarettes by artificially manipulating the TAR (Mediator) values to the values that would have been if smoking or if not smoking.
 :::
@@ -211,26 +207,6 @@ $NIE = Y|[do(M|do(a=1))] - Y|[do(M|do(a=0))]$
 -   NIE under Pure mediation contains all the harm made by cigarettes by artificially manipulating the TAR (Mediator) values to the values that would have been if smoking or if not smoking.
 
 -   Again, the original treatment assignment A becomes irrelevant.
-:::
-:::::
-
-## NIE under Pure Mediation {.smaller}
-
-::::: columns
-::: {.column width="30%"}
-![](nde.png)
-
-![](nie.png)
-:::
-
-::: {.column width="70%"}
-$NIE = Y|do(a=1) - Y|do(a=0) = TE$
-
--   NIE under Pure mediation contains all the harm made by cigarettes by artificially manipulating the TAR (Mediator) values to the values that would have been if smoking or if not smoking.
-
--   Again, the original treatment assignment A becomes irrelevant.
-
--   Finally, we get the Total Effect that is being mediated from the treatment to the outcome.
 :::
 :::::
 
@@ -331,10 +307,11 @@ countefactual_data_reactable_raw <- countefactual_data |>
     M_a0 = colDef(
       name = "M<sup>A0",
       html = TRUE,
-      style = function(value) {
-      if(value == "1")
+  style = function(value) {
+    if (value == "1") {
       list(background = "lightgray")
     }
+  }
     ),
     Y_a1 = colDef(
       name = "Y<sup>A1",
@@ -375,16 +352,430 @@ countefactual_data_reactable_raw
 
 #### 😇 God-Given Counterfactual Data
 
-Let's calculate NIE:
-
-###### Setting do(A=1)
-$$Y|[do(M|do(A=1))]$$
-- We take the counterfactual M values for A=1
-
-- And the corresponding counterfactual Y values
-
+We can now explore how the components of the Natural Indirect Effect:
 
 :::
 
 
 :::::
+
+## {.smaller}
+
+::::: columns
+::: {.column width="45%"}
+
+```{r}
+countefactual_data <- tibble::tribble(
+   ~"X", ~"A", ~"Y_a0", ~"Y_a1", ~"M_a0", ~"M_a1", ~"Y_m0", ~"Y_m1",
+   "0", "1", "0", "1", "0", "1", "0", "1",
+   "0", "1", "0", "0", "0", "0", "0", "0",
+   "0", "0", "1", "1", "1", "1", "1", "1",
+   "0", "0", "0", "1", "0", "1", "0", "1",
+   "0", "0", "0", "0", "0", "0", "0", "0",
+   "0", "0", "0", "0", "0", "0", "0", "0", 
+   "1", "1", "1", "1", "1", "1", "0", "1", 
+   "1", "1", "1", "1", "1", "1", "0", "1",
+   "1", "1", "1", "1", "1", "1", "0", "1",
+   "1", "1", "1", "1", "0", "0", "1", "1",
+   "1", "1", "1", "1", "1", "1", "1", "1",
+   "1", "1", "0", "1", "0", "1", "0", "1",
+   "1", "1", "0", "0", "0", "0", "0", "1",
+   "1", "1", "0", "0", "0", "0", "0", "0",
+   "1", "0", "1", "1", "1", "1", "0", "1",
+   "1", "0", "0", "1", "0", "1", "0", "1"
+  ) |> 
+  mutate(
+    observed_y = case_when(
+      A == "0" ~ Y_a0,
+      A == "1" ~ Y_a1
+    ),
+    ITE = as.numeric(Y_a1) - as.numeric(Y_a0)
+  ) |> 
+  arrange(
+    A, observed_y, X
+  ) |> 
+  select(X, A, M_a0, M_a1, Y_m0, Y_m1, Y_a0, Y_a1, ITE) |> 
+  mutate(
+    observed_m = case_when(
+      A == "0" ~ M_a0,
+      A == "1" ~ M_a1
+    ),
+    observed_y = case_when(
+      A == "0" ~ Y_a0,
+      A == "1" ~ Y_a1
+    )
+  ) |> 
+  arrange(
+    A, observed_y, X
+  )
+
+countefactual_data_reactable_raw <- countefactual_data |> 
+  reactable(
+    theme = reactableTheme(
+      backgroundColor = "#F5F2EB",
+      tableStyle = list(
+        backgroundColor = "#F5F2EB"
+      ),
+      headerStyle = list(
+        backgroundColor = "#F5F2EB"
+      ),
+      cellStyle = list(
+        backgroundColor = "#F5F2EB"
+      )
+    ),
+    sortable = FALSE,
+    defaultPageSize = 19,
+    columns = list(
+      observed_y = colDef(
+        show = FALSE
+      ),
+      observed_m = colDef(
+        show = FALSE
+      ),
+      ITE = colDef(
+        style = function(value) {
+          if (value == "1")
+            list(background = "pink")
+        }
+      ),
+      Y_a0 = colDef(
+        name = "Y<sup>A0",
+        html = TRUE,
+        style = function(value) {
+          
+        base_style <- list(
+            boxShadow = "inset 0 0 0 3px #0B3D02"
+          )
+        
+          if (value == "1"){
+            base_style$background <- "pink"
+          }
+        
+          base_style
+        
+        }
+      ),
+      M_a1 = colDef(
+        name = "M<sup>A1",
+        html = TRUE,
+        style = function(value) {
+          if (value == "1")
+            list(background = "lightgray")
+        }
+      ),
+      M_a0 = colDef(
+        name = "M<sup>A0",
+        html = TRUE,
+        style = function(value) {
+          base_style <- list(
+            boxShadow = "inset 0 0 0 3px #0B3D02"
+          )
+
+          if (value == "1") {
+            base_style$background <- "lightgray"
+          }
+
+          base_style
+        }
+      ),
+      Y_a1 = colDef(
+        name = "Y<sup>A1",
+        html = TRUE,
+        style = function(value) {
+          if (value == "1")
+            list(background = "pink")
+        }
+      ),
+      Y_m0 = colDef(
+        name = "Y<sup>M0",
+        html = TRUE,
+        style = function(value, index, name) {
+          base_style <- list()
+
+          # keep your original blue background logic
+          if (value == "1") {
+            base_style$background <- "#E6D7FF"
+          }
+
+          # add rectangle to Y_m0 when M_a0 == "0"
+          if (!is.null(index) && countefactual_data$M_a0[index] == "0") {
+            base_style$boxShadow <- "inset 0 0 0 3px #0B3D02"
+          }
+
+          base_style
+        }
+      ),
+      Y_m1 = colDef(
+        name = "Y<sup>M1",
+        html = TRUE,
+        style = function(value, index, name) {
+          base_style <- list()
+
+          # keep your original blue background logic
+          if (value == "1") {
+            base_style$background <- "#E6D7FF"
+          }
+
+          # add rectangle to Y_m1 when M_a0 == "1"
+          if (!is.null(index) && countefactual_data$M_a0[index] == "1") {
+            base_style$boxShadow <- "inset 0 0 0 3px #0B3D02"
+          }
+
+          base_style
+        }
+      )
+    ),
+    defaultColDef = colDef(maxWidth = 50),
+    style = list(fontSize = "1rem")
+  )
+
+countefactual_data_reactable_raw
+
+```
+
+:::
+
+::: {.column width="55%"}
+
+#### 😇 God-Given Counterfactual Data
+
+We can now explore how the components of the Natural Indirect Effect:
+
+$$Y|[do(M|do(a=0))] = Y|do(A=0)$$
+
+![](nde.png)
+
+:::
+
+
+:::::
+
+## {.smaller}
+
+::::: columns
+::: {.column width="45%"}
+
+```{r}
+countefactual_data <- tibble::tribble(
+   ~"X", ~"A", ~"Y_a0", ~"Y_a1", ~"M_a0", ~"M_a1", ~"Y_m0", ~"Y_m1",
+   "0", "1", "0", "1", "0", "1", "0", "1",
+   "0", "1", "0", "0", "0", "0", "0", "0",
+   "0", "0", "1", "1", "1", "1", "1", "1",
+   "0", "0", "0", "1", "0", "1", "0", "1",
+   "0", "0", "0", "0", "0", "0", "0", "0",
+   "0", "0", "0", "0", "0", "0", "0", "0", 
+   "1", "1", "1", "1", "1", "1", "0", "1", 
+   "1", "1", "1", "1", "1", "1", "0", "1",
+   "1", "1", "1", "1", "1", "1", "0", "1",
+   "1", "1", "1", "1", "0", "0", "1", "1",
+   "1", "1", "1", "1", "1", "1", "1", "1",
+   "1", "1", "0", "1", "0", "1", "0", "1",
+   "1", "1", "0", "0", "0", "0", "0", "1",
+   "1", "1", "0", "0", "0", "0", "0", "0",
+   "1", "0", "1", "1", "1", "1", "0", "1",
+   "1", "0", "0", "1", "0", "1", "0", "1"
+  ) |> 
+  mutate(
+    observed_y = case_when(
+      A == "0" ~ Y_a0,
+      A == "1" ~ Y_a1
+    ),
+    ITE = as.numeric(Y_a1) - as.numeric(Y_a0)
+  ) |> 
+  arrange(
+    A, observed_y, X
+  ) |> 
+  select(X, A, M_a0, M_a1, Y_m0, Y_m1, Y_a0, Y_a1, ITE) |> 
+  mutate(
+    observed_m = case_when(
+      A == "0" ~ M_a0,
+      A == "1" ~ M_a1
+    ),
+    observed_y = case_when(
+      A == "0" ~ Y_a0,
+      A == "1" ~ Y_a1
+    )
+  ) |> 
+  arrange(
+    A, observed_y, X
+  )
+
+countefactual_data_reactable_raw <- countefactual_data |> 
+  reactable(
+    theme = reactableTheme(
+      backgroundColor = "#F5F2EB",
+      tableStyle = list(
+        backgroundColor = "#F5F2EB"
+      ),
+      headerStyle = list(
+        backgroundColor = "#F5F2EB"
+      ),
+      cellStyle = list(
+        backgroundColor = "#F5F2EB"
+      )
+    ),
+    sortable = FALSE,
+    defaultPageSize = 19,
+    columns = list(
+      observed_y = colDef(
+        show = FALSE
+      ),
+      observed_m = colDef(
+        show = FALSE
+      ),
+      ITE = colDef(
+        style = function(value) {
+          if (value == "1")
+            list(background = "pink")
+        }
+      ),
+
+      # Y_a0: back to simple pink highlight, no rectangle
+      Y_a0 = colDef(
+        name = "Y<sup>A0",
+        html = TRUE,
+        style = function(value) {
+          if (value == "1")
+            list(background = "pink")
+        }
+      ),
+
+      # M_a1: now gets the rectangle (instead of M_a0)
+      M_a1 = colDef(
+        name = "M<sup>A1",
+        html = TRUE,
+        style = function(value) {
+          base_style <- list(
+            boxShadow = "inset 0 0 0 3px #0B3D02"
+          )
+
+          if (value == "1") {
+            base_style$background <- "lightgray"
+          }
+
+          base_style
+        }
+      ),
+
+      # M_a0: no rectangle now, just original lightgray for 1
+      M_a0 = colDef(
+        name = "M<sup>A0",
+        html = TRUE,
+        style = function(value) {
+          if (value == "1")
+            list(background = "lightgray")
+        }
+      ),
+
+      # Y_a1: now boxed instead of Y_a0
+      Y_a1 = colDef(
+        name = "Y<sup>A1",
+        html = TRUE,
+        style = function(value) {
+          base_style <- list(
+            boxShadow = "inset 0 0 0 3px #0B3D02"
+          )
+
+          if (value == "1") {
+            base_style$background <- "pink"
+          }
+
+          base_style
+        }
+      ),
+
+      # Y_m0: rectangle if M_a1 == "0"
+      Y_m0 = colDef(
+        name = "Y<sup>M0",
+        html = TRUE,
+        style = function(value, index, name) {
+          base_style <- list()
+
+          # keep original blue highlight
+          if (value == "1") {
+            base_style$background <- "#E6D7FF"
+          }
+
+          # add rectangle to Y_m0 when M_a1 == "0"
+          if (!is.null(index) && countefactual_data$M_a1[index] == "0") {
+            base_style$boxShadow <- "inset 0 0 0 3px #0B3D02"
+          }
+
+          base_style
+        }
+      ),
+
+      # Y_m1: rectangle if M_a1 == "1"
+      Y_m1 = colDef(
+        name = "Y<sup>M1",
+        html = TRUE,
+        style = function(value, index, name) {
+          base_style <- list()
+
+          # keep original blue highlight
+          if (value == "1") {
+            base_style$background <- "#E6D7FF"
+          }
+
+          # add rectangle to Y_m1 when M_a1 == "1"
+          if (!is.null(index) && countefactual_data$M_a1[index] == "1") {
+            base_style$boxShadow <- "inset 0 0 0 3px #0B3D02"
+          }
+
+          base_style
+        }
+      )
+    ),
+    defaultColDef = colDef(maxWidth = 50),
+    style = list(fontSize = "1rem")
+  )
+
+countefactual_data_reactable_raw
+
+
+```
+
+:::
+
+::: {.column width="55%"}
+
+#### 😇 God-Given Counterfactual Data
+
+We can now explore how the components of the Natural Indirect Effect:
+
+$$Y|[do(M|do(a=1))] = Y|do(A=1)$$
+
+![](nie.png)
+:::
+
+:::::
+
+## NIE under Pure Mediation {.smaller}
+
+::::: columns
+::: {.column width="30%"}
+![](nde.png)
+
+![](nie.png)
+:::
+
+::: {.column width="70%"}
+$NIE = Y|do(a=1) - Y|do(a=0) = TE$
+
+Finally, we can see that the Natural Indirect Effect is equal to the Total Effect that is being mediated from the treatment to the outcome in case of pure mediation.
+
+:::
+:::::
+
+
+## Inspiration {.smaller}
+
+
+{{< video https://youtu.be/e1a5Ftdd8Xw width="50%" height="42.5%" >}}
+
+
+The images in this presentation are highly inspired by the wonderful French TV-Series: "Il était une fois… la Vie".
+
+Every time I think about unintuitive mediators in healthcare, I remember how this educational animated TV series helped me understand complicated material.
+
+And also in [English](https://www.youtube.com/watch?v=sn3tBnb4Nck) and [Hebrew](https://www.youtube.com/watch?v=sn3tBnb4Nck)
