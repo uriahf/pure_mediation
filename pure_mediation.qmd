@@ -8,9 +8,148 @@ format: revealjs
 
 ```{r}
 #| echo: false
+#| include: false
 
 library(reactable)
 library(dplyr)
+
+# Define the god-given data
+countefactual_data <- tibble::tribble(
+   ~"X", ~"A", ~"Y_a0", ~"Y_a1", ~"M_a0", ~"M_a1", ~"Y_m0", ~"Y_m1",
+   "0", "1", "0", "1", "0", "1", "0", "1",
+   "0", "1", "0", "0", "0", "0", "0", "0",
+   "0", "0", "1", "1", "1", "1", "1", "1",
+   "0", "0", "0", "1", "0", "1", "0", "1",
+   "0", "0", "0", "0", "0", "0", "0", "0",
+   "0", "0", "0", "0", "0", "0", "0", "0",
+   "1", "1", "1", "1", "1", "1", "0", "1",
+   "1", "1", "1", "1", "1", "1", "0", "1",
+   "1", "1", "1", "1", "1", "1", "0", "1",
+   "1", "1", "1", "1", "0", "0", "1", "1",
+   "1", "1", "1", "1", "1", "1", "1", "1",
+   "1", "1", "0", "1", "0", "1", "0", "1",
+   "1", "1", "0", "0", "0", "0", "0", "1",
+   "1", "1", "0", "0", "0", "0", "0", "0",
+   "1", "0", "1", "1", "1", "1", "0", "1",
+   "1", "0", "0", "1", "0", "1", "0", "1"
+  ) |>
+  mutate(
+    observed_y = case_when(
+      A == "0" ~ Y_a0,
+      A == "1" ~ Y_a1
+    ),
+    ITE = as.numeric(Y_a1) - as.numeric(Y_a0)
+  ) |>
+  arrange(
+    A, observed_y, X
+  ) |>
+  select(X, A, M_a0, M_a1, Y_m0, Y_m1, Y_a0, Y_a1, ITE) |>
+  mutate(
+    observed_m = case_when(
+      A == "0" ~ M_a0,
+      A == "1" ~ M_a1
+    ),
+    observed_y = case_when(
+      A == "0" ~ Y_a0,
+      A == "1" ~ Y_a1
+    )
+  ) |>
+  arrange(
+    A, observed_y, X
+  )
+
+# Function to create the reactable table
+create_reactable <- function(data,
+                             y_a0_boxed = FALSE, y_a1_boxed = FALSE,
+                             m_a0_boxed = FALSE, m_a1_boxed = FALSE,
+                             y_m0_boxed_if_m_a0_eq_0 = FALSE, y_m1_boxed_if_m_a0_eq_1 = FALSE,
+                             y_m0_boxed_if_m_a1_eq_0 = FALSE, y_m1_boxed_if_m_a1_eq_1 = FALSE
+                             ) {
+
+  # Base style function for pink background
+  style_pink <- function(value) {
+    if (value == "1") list(background = "pink")
+  }
+
+  # Base style function for lightgray background
+  style_lightgray <- function(value) {
+    if (value == "1") list(background = "lightgray")
+  }
+
+  # Base style function for blue background
+  style_blue <- function(value) {
+    if (value == "1") list(background = "#E6D7FF")
+  }
+
+  # Function to add a box shadow (rectangle)
+  add_box_shadow <- function(style, condition) {
+    if (condition) {
+      style$boxShadow <- "inset 0 0 0 3px #0B3D02"
+    }
+    style
+  }
+
+  reactable(
+    data,
+    theme = reactableTheme(
+      backgroundColor = "#F5F2EB",
+      tableStyle = list(backgroundColor = "#F5F2EB"),
+      headerStyle = list(backgroundColor = "#F5F2EB"),
+      cellStyle = list(backgroundColor = "#F5F2EB")
+    ),
+    sortable = FALSE,
+    defaultPageSize = 19,
+    columns = list(
+      observed_y = colDef(show = FALSE),
+      observed_m = colDef(show = FALSE),
+      ITE = colDef(style = style_pink),
+      Y_a0 = colDef(name = "Y<sup>A0", html = TRUE,
+                    style = function(value) {
+                      style <- style_pink(value)
+                      add_box_shadow(style, y_a0_boxed)
+                    }),
+      M_a1 = colDef(name = "M<sup>A1", html = TRUE,
+                    style = function(value) {
+                      style <- style_lightgray(value)
+                      add_box_shadow(style, m_a1_boxed)
+                    }),
+      M_a0 = colDef(name = "M<sup>A0", html = TRUE,
+                    style = function(value) {
+                      style <- style_lightgray(value)
+                      add_box_shadow(style, m_a0_boxed)
+                    }),
+      Y_a1 = colDef(name = "Y<sup>A1", html = TRUE,
+                    style = function(value) {
+                      style <- style_pink(value)
+                      add_box_shadow(style, y_a1_boxed)
+                    }),
+      Y_m0 = colDef(name = "Y<sup>M0", html = TRUE,
+                    style = function(value, index) {
+                      style <- style_blue(value)
+                      if (y_m0_boxed_if_m_a0_eq_0 && !is.null(index) && data$M_a0[index] == "0") {
+                        style$boxShadow <- "inset 0 0 0 3px #0B3D02"
+                      }
+                      if (y_m0_boxed_if_m_a1_eq_0 && !is.null(index) && data$M_a1[index] == "0") {
+                        style$boxShadow <- "inset 0 0 0 3px #0B3D02"
+                      }
+                      style
+                    }),
+      Y_m1 = colDef(name = "Y<sup>M1", html = TRUE,
+                    style = function(value, index) {
+                      style <- style_blue(value)
+                      if (y_m1_boxed_if_m_a0_eq_1 && !is.null(index) && data$M_a0[index] == "1") {
+                        style$boxShadow <- "inset 0 0 0 3px #0B3D02"
+                      }
+                      if (y_m1_boxed_if_m_a1_eq_1 && !is.null(index) && data$M_a1[index] == "1") {
+                        style$boxShadow <- "inset 0 0 0 3px #0B3D02"
+                      }
+                      style
+                    })
+    ),
+    defaultColDef = colDef(maxWidth = 50),
+    style = list(fontSize = "1rem")
+  )
+}
 ```
 
 
@@ -216,134 +355,8 @@ $NIE = Y|[do(M|do(a=1))] - Y|[do(M|do(a=0))]$
 ::: {.column width="45%"}
 
 ```{r}
-countefactual_data <- tibble::tribble(
-   ~"X", ~"A", ~"Y_a0", ~"Y_a1", ~"M_a0", ~"M_a1", ~"Y_m0", ~"Y_m1",
-   "0", "1", "0", "1", "0", "1", "0", "1",
-   "0", "1", "0", "0", "0", "0", "0", "0",
-   "0", "0", "1", "1", "1", "1", "1", "1",
-   "0", "0", "0", "1", "0", "1", "0", "1",
-   "0", "0", "0", "0", "0", "0", "0", "0",
-   "0", "0", "0", "0", "0", "0", "0", "0", 
-   "1", "1", "1", "1", "1", "1", "0", "1", 
-   "1", "1", "1", "1", "1", "1", "0", "1",
-   "1", "1", "1", "1", "1", "1", "0", "1",
-   "1", "1", "1", "1", "0", "0", "1", "1",
-   "1", "1", "1", "1", "1", "1", "1", "1",
-   "1", "1", "0", "1", "0", "1", "0", "1",
-   "1", "1", "0", "0", "0", "0", "0", "1",
-   "1", "1", "0", "0", "0", "0", "0", "0",
-   "1", "0", "1", "1", "1", "1", "0", "1",
-   "1", "0", "0", "1", "0", "1", "0", "1"
-  ) |> 
-  mutate(
-    observed_y = case_when(
-      A == "0" ~ Y_a0,
-      A == "1" ~ Y_a1
-    ),
-    ITE = as.numeric(Y_a1) - as.numeric(Y_a0)
-  ) |> 
-  arrange(
-    A, observed_y, X
-  ) |> 
-  select(X, A, M_a0, M_a1, Y_m0, Y_m1, Y_a0, Y_a1, ITE) |> 
-  mutate(
-    observed_m = case_when(
-      A == "0" ~ M_a0,
-      A == "1" ~ M_a1
-    ),
-    observed_y = case_when(
-      A == "0" ~ Y_a0,
-      A == "1" ~ Y_a1
-    )
-  ) |> 
-  arrange(
-    A, observed_y, X
-  )
-
-countefactual_data_reactable_raw <- countefactual_data |> 
-  reactable(
-    theme = reactableTheme(
-      backgroundColor = "#F5F2EB",
-      tableStyle = list(
-        backgroundColor = "#F5F2EB"
-      ),
-      headerStyle = list(
-        backgroundColor = "#F5F2EB"
-      ),
-      cellStyle = list(
-        backgroundColor = "#F5F2EB"
-      )),
-  sortable = FALSE,
-  defaultPageSize = 19,
-  columns = list(
-    observed_y = colDef(
-      show = FALSE
-    ),
-    observed_m = colDef(
-      show = FALSE
-    ),
-    ITE = colDef(
-      style = function(value) {
-      if(value == "1")
-      list(background = "pink")
-    }
-    ),
-    Y_a0 = colDef(
-      name = "Y<sup>A0",
-      html = TRUE,
-      style = function(value) {
-      if(value == "1")
-      list(background = "pink")
-    }
-    ),
-    M_a1 = colDef(
-      name = "M<sup>A1",
-      html = TRUE,
-      style = function(value) {
-      if(value == "1")
-      list(background = "lightgray")
-    }
-    ),
-    M_a0 = colDef(
-      name = "M<sup>A0",
-      html = TRUE,
-  style = function(value) {
-    if (value == "1") {
-      list(background = "lightgray")
-    }
-  }
-    ),
-    Y_a1 = colDef(
-      name = "Y<sup>A1",
-      html = TRUE,
-      style = function(value) {
-      if(value == "1")
-      list(background = "pink")
-    }
-    ),
-    Y_m0 = colDef(
-      name = "Y<sup>M0",
-      html = TRUE,
-      style = function(value) {
-      if(value == "1")
-      list(background = "#E6D7FF")
-    }
-    ),
-    Y_m1 = colDef(
-      name = "Y<sup>M1",
-      html = TRUE,
-      style = function(value) {
-      if(value == "1")
-      list(background = "#E6D7FF")
-    }
-    )
-  ),
-  defaultColDef = colDef(maxWidth = 50),
-  style = list(fontSize = "1rem"))
-
-
-countefactual_data_reactable_raw
-
+#| echo: false
+create_reactable(countefactual_data)
 ```
 
 :::
@@ -365,172 +378,12 @@ We can now explore how the components of the Natural Indirect Effect:
 ::: {.column width="45%"}
 
 ```{r}
-countefactual_data <- tibble::tribble(
-   ~"X", ~"A", ~"Y_a0", ~"Y_a1", ~"M_a0", ~"M_a1", ~"Y_m0", ~"Y_m1",
-   "0", "1", "0", "1", "0", "1", "0", "1",
-   "0", "1", "0", "0", "0", "0", "0", "0",
-   "0", "0", "1", "1", "1", "1", "1", "1",
-   "0", "0", "0", "1", "0", "1", "0", "1",
-   "0", "0", "0", "0", "0", "0", "0", "0",
-   "0", "0", "0", "0", "0", "0", "0", "0", 
-   "1", "1", "1", "1", "1", "1", "0", "1", 
-   "1", "1", "1", "1", "1", "1", "0", "1",
-   "1", "1", "1", "1", "1", "1", "0", "1",
-   "1", "1", "1", "1", "0", "0", "1", "1",
-   "1", "1", "1", "1", "1", "1", "1", "1",
-   "1", "1", "0", "1", "0", "1", "0", "1",
-   "1", "1", "0", "0", "0", "0", "0", "1",
-   "1", "1", "0", "0", "0", "0", "0", "0",
-   "1", "0", "1", "1", "1", "1", "0", "1",
-   "1", "0", "0", "1", "0", "1", "0", "1"
-  ) |> 
-  mutate(
-    observed_y = case_when(
-      A == "0" ~ Y_a0,
-      A == "1" ~ Y_a1
-    ),
-    ITE = as.numeric(Y_a1) - as.numeric(Y_a0)
-  ) |> 
-  arrange(
-    A, observed_y, X
-  ) |> 
-  select(X, A, M_a0, M_a1, Y_m0, Y_m1, Y_a0, Y_a1, ITE) |> 
-  mutate(
-    observed_m = case_when(
-      A == "0" ~ M_a0,
-      A == "1" ~ M_a1
-    ),
-    observed_y = case_when(
-      A == "0" ~ Y_a0,
-      A == "1" ~ Y_a1
-    )
-  ) |> 
-  arrange(
-    A, observed_y, X
-  )
-
-countefactual_data_reactable_raw <- countefactual_data |> 
-  reactable(
-    theme = reactableTheme(
-      backgroundColor = "#F5F2EB",
-      tableStyle = list(
-        backgroundColor = "#F5F2EB"
-      ),
-      headerStyle = list(
-        backgroundColor = "#F5F2EB"
-      ),
-      cellStyle = list(
-        backgroundColor = "#F5F2EB"
-      )
-    ),
-    sortable = FALSE,
-    defaultPageSize = 19,
-    columns = list(
-      observed_y = colDef(
-        show = FALSE
-      ),
-      observed_m = colDef(
-        show = FALSE
-      ),
-      ITE = colDef(
-        style = function(value) {
-          if (value == "1")
-            list(background = "pink")
-        }
-      ),
-      Y_a0 = colDef(
-        name = "Y<sup>A0",
-        html = TRUE,
-        style = function(value) {
-          
-        base_style <- list(
-            boxShadow = "inset 0 0 0 3px #0B3D02"
-          )
-        
-          if (value == "1"){
-            base_style$background <- "pink"
-          }
-        
-          base_style
-        
-        }
-      ),
-      M_a1 = colDef(
-        name = "M<sup>A1",
-        html = TRUE,
-        style = function(value) {
-          if (value == "1")
-            list(background = "lightgray")
-        }
-      ),
-      M_a0 = colDef(
-        name = "M<sup>A0",
-        html = TRUE,
-        style = function(value) {
-          base_style <- list(
-            boxShadow = "inset 0 0 0 3px #0B3D02"
-          )
-
-          if (value == "1") {
-            base_style$background <- "lightgray"
-          }
-
-          base_style
-        }
-      ),
-      Y_a1 = colDef(
-        name = "Y<sup>A1",
-        html = TRUE,
-        style = function(value) {
-          if (value == "1")
-            list(background = "pink")
-        }
-      ),
-      Y_m0 = colDef(
-        name = "Y<sup>M0",
-        html = TRUE,
-        style = function(value, index, name) {
-          base_style <- list()
-
-          # keep your original blue background logic
-          if (value == "1") {
-            base_style$background <- "#E6D7FF"
-          }
-
-          # add rectangle to Y_m0 when M_a0 == "0"
-          if (!is.null(index) && countefactual_data$M_a0[index] == "0") {
-            base_style$boxShadow <- "inset 0 0 0 3px #0B3D02"
-          }
-
-          base_style
-        }
-      ),
-      Y_m1 = colDef(
-        name = "Y<sup>M1",
-        html = TRUE,
-        style = function(value, index, name) {
-          base_style <- list()
-
-          # keep your original blue background logic
-          if (value == "1") {
-            base_style$background <- "#E6D7FF"
-          }
-
-          # add rectangle to Y_m1 when M_a0 == "1"
-          if (!is.null(index) && countefactual_data$M_a0[index] == "1") {
-            base_style$boxShadow <- "inset 0 0 0 3px #0B3D02"
-          }
-
-          base_style
-        }
-      )
-    ),
-    defaultColDef = colDef(maxWidth = 50),
-    style = list(fontSize = "1rem")
-  )
-
-countefactual_data_reactable_raw
-
+#| echo: false
+create_reactable(countefactual_data,
+                 y_a0_boxed = TRUE,
+                 m_a0_boxed = TRUE,
+                 y_m0_boxed_if_m_a0_eq_0 = TRUE,
+                 y_m1_boxed_if_m_a0_eq_1 = TRUE)
 ```
 
 :::
@@ -556,183 +409,12 @@ $$Y|[do(M|do(a=0))] = Y|do(A=0)$$
 ::: {.column width="45%"}
 
 ```{r}
-countefactual_data <- tibble::tribble(
-   ~"X", ~"A", ~"Y_a0", ~"Y_a1", ~"M_a0", ~"M_a1", ~"Y_m0", ~"Y_m1",
-   "0", "1", "0", "1", "0", "1", "0", "1",
-   "0", "1", "0", "0", "0", "0", "0", "0",
-   "0", "0", "1", "1", "1", "1", "1", "1",
-   "0", "0", "0", "1", "0", "1", "0", "1",
-   "0", "0", "0", "0", "0", "0", "0", "0",
-   "0", "0", "0", "0", "0", "0", "0", "0", 
-   "1", "1", "1", "1", "1", "1", "0", "1", 
-   "1", "1", "1", "1", "1", "1", "0", "1",
-   "1", "1", "1", "1", "1", "1", "0", "1",
-   "1", "1", "1", "1", "0", "0", "1", "1",
-   "1", "1", "1", "1", "1", "1", "1", "1",
-   "1", "1", "0", "1", "0", "1", "0", "1",
-   "1", "1", "0", "0", "0", "0", "0", "1",
-   "1", "1", "0", "0", "0", "0", "0", "0",
-   "1", "0", "1", "1", "1", "1", "0", "1",
-   "1", "0", "0", "1", "0", "1", "0", "1"
-  ) |> 
-  mutate(
-    observed_y = case_when(
-      A == "0" ~ Y_a0,
-      A == "1" ~ Y_a1
-    ),
-    ITE = as.numeric(Y_a1) - as.numeric(Y_a0)
-  ) |> 
-  arrange(
-    A, observed_y, X
-  ) |> 
-  select(X, A, M_a0, M_a1, Y_m0, Y_m1, Y_a0, Y_a1, ITE) |> 
-  mutate(
-    observed_m = case_when(
-      A == "0" ~ M_a0,
-      A == "1" ~ M_a1
-    ),
-    observed_y = case_when(
-      A == "0" ~ Y_a0,
-      A == "1" ~ Y_a1
-    )
-  ) |> 
-  arrange(
-    A, observed_y, X
-  )
-
-countefactual_data_reactable_raw <- countefactual_data |> 
-  reactable(
-    theme = reactableTheme(
-      backgroundColor = "#F5F2EB",
-      tableStyle = list(
-        backgroundColor = "#F5F2EB"
-      ),
-      headerStyle = list(
-        backgroundColor = "#F5F2EB"
-      ),
-      cellStyle = list(
-        backgroundColor = "#F5F2EB"
-      )
-    ),
-    sortable = FALSE,
-    defaultPageSize = 19,
-    columns = list(
-      observed_y = colDef(
-        show = FALSE
-      ),
-      observed_m = colDef(
-        show = FALSE
-      ),
-      ITE = colDef(
-        style = function(value) {
-          if (value == "1")
-            list(background = "pink")
-        }
-      ),
-
-      # Y_a0: back to simple pink highlight, no rectangle
-      Y_a0 = colDef(
-        name = "Y<sup>A0",
-        html = TRUE,
-        style = function(value) {
-          if (value == "1")
-            list(background = "pink")
-        }
-      ),
-
-      # M_a1: now gets the rectangle (instead of M_a0)
-      M_a1 = colDef(
-        name = "M<sup>A1",
-        html = TRUE,
-        style = function(value) {
-          base_style <- list(
-            boxShadow = "inset 0 0 0 3px #0B3D02"
-          )
-
-          if (value == "1") {
-            base_style$background <- "lightgray"
-          }
-
-          base_style
-        }
-      ),
-
-      # M_a0: no rectangle now, just original lightgray for 1
-      M_a0 = colDef(
-        name = "M<sup>A0",
-        html = TRUE,
-        style = function(value) {
-          if (value == "1")
-            list(background = "lightgray")
-        }
-      ),
-
-      # Y_a1: now boxed instead of Y_a0
-      Y_a1 = colDef(
-        name = "Y<sup>A1",
-        html = TRUE,
-        style = function(value) {
-          base_style <- list(
-            boxShadow = "inset 0 0 0 3px #0B3D02"
-          )
-
-          if (value == "1") {
-            base_style$background <- "pink"
-          }
-
-          base_style
-        }
-      ),
-
-      # Y_m0: rectangle if M_a1 == "0"
-      Y_m0 = colDef(
-        name = "Y<sup>M0",
-        html = TRUE,
-        style = function(value, index, name) {
-          base_style <- list()
-
-          # keep original blue highlight
-          if (value == "1") {
-            base_style$background <- "#E6D7FF"
-          }
-
-          # add rectangle to Y_m0 when M_a1 == "0"
-          if (!is.null(index) && countefactual_data$M_a1[index] == "0") {
-            base_style$boxShadow <- "inset 0 0 0 3px #0B3D02"
-          }
-
-          base_style
-        }
-      ),
-
-      # Y_m1: rectangle if M_a1 == "1"
-      Y_m1 = colDef(
-        name = "Y<sup>M1",
-        html = TRUE,
-        style = function(value, index, name) {
-          base_style <- list()
-
-          # keep original blue highlight
-          if (value == "1") {
-            base_style$background <- "#E6D7FF"
-          }
-
-          # add rectangle to Y_m1 when M_a1 == "1"
-          if (!is.null(index) && countefactual_data$M_a1[index] == "1") {
-            base_style$boxShadow <- "inset 0 0 0 3px #0B3D02"
-          }
-
-          base_style
-        }
-      )
-    ),
-    defaultColDef = colDef(maxWidth = 50),
-    style = list(fontSize = "1rem")
-  )
-
-countefactual_data_reactable_raw
-
-
+#| echo: false
+create_reactable(countefactual_data,
+                 y_a1_boxed = TRUE,
+                 m_a1_boxed = TRUE,
+                 y_m0_boxed_if_m_a1_eq_0 = TRUE,
+                 y_m1_boxed_if_m_a1_eq_1 = TRUE)
 ```
 
 :::
