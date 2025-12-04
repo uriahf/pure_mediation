@@ -58,7 +58,7 @@ Smoking 🚬 might cause COPD 🫁 only by increasing TAR ⚫ levels in the lung
 
 -   Controlling both treatment and mediation variables might feel unnatural:
 
-$CDE(m) = Y | [do(a=1),do(m)] - Y|do[a=0,do(m)]$
+$CDE(m) = Y | [do(A=1),do(m)] - Y|[do(A=0),do(m)]$
 :::
 :::::
 
@@ -76,7 +76,7 @@ $CDE(m) = Y | [do(a=1),do(m)] - Y|do[a=0,do(m)]$
 
 -   Controlling both treatment and mediation variables might feel unnatural:
 
-$CDE(m) = Y | [do(a=1),do(m)] - Y|do[a=0,do(m)]$
+$CDE(m) = Y | [do(A=1),do(m)] - Y|[do(A=0),do(m)]$
 
 -   If that's not weird enough, most M interventions are not well-defined. If Smoking (A) leads to TAR (M) that leads to (Y): How can we manipulate TAR independently? We might think of little people that clean TAR from our lungs (M=0) or adding TAR to our lungs (M=1).
 :::
@@ -90,7 +90,7 @@ $CDE(m) = Y | [do(a=1),do(m)] - Y|do[a=0,do(m)]$
 :::
 
 ::: {.column width="70%"}
-$CDE(m) = Y | [do(a=1),do(m)] - Y|do[a=0,do(m)]$
+$CDE(m) = Y | [do(A=1),do(m)] - Y|[do(A=0),do(m)]$
 
 Mediation put us closer to "How Nature Works". By making our causal paths more explicit, we make our narrative closer to the domain expertise. Smoking makes COPD, is not as clear as Smoking makes COPD by increasing TAR in the lungs.
 
@@ -106,7 +106,11 @@ Pure mediation puts the boundaries around the possible causal paths.
 :::
 
 ::: {.column width="70%"}
-$CDE(m) = Y | [do(a=1),do(m)] - Y|[do(a=0),do(m)]]$
+$CDE(m) = Y | [do(A=1),do(m)] - Y|[do(A=0),do(m)]$
+
+Assuming Pure Mediation:
+
+$CDE(m) = Y |do(m) - Y|do(m) = 0$
 
 -   CDE under Pure mediation blocks all the harm made by cigarettes.
 :::
@@ -120,7 +124,11 @@ $CDE(m) = Y | [do(a=1),do(m)] - Y|[do(a=0),do(m)]]$
 :::
 
 ::: {.column width="70%"}
-$CDE(m) = Y | [do(a=1),do(m)] - Y|[do(a=0),do(m)]]$
+$CDE(m) = Y | [do(A=1),do(m)] - Y|[do(A=0),do(m)]$
+
+Assuming Pure Mediation:
+
+$CDE(M=0) = Y |do(M=0) - Y|do(M=0) = 0$
 
 -   CDE under Pure mediation blocks all the harm made by cigarettes.
 
@@ -136,7 +144,11 @@ $CDE(m) = Y | [do(a=1),do(m)] - Y|[do(a=0),do(m)]]$
 :::
 
 ::: {.column width="70%"}
-$CDE(m) = Y | [do(a=1),do(m)] - Y|[do(a=0),do(m)]]$
+$CDE(m) = Y | [do(A=1),do(m)] - Y|[do(A=0),do(m)]$
+
+Assuming Pure Mediation:
+
+$CDE(M=1) = Y |do(M=1) - Y|do(M=1) = 0$
 
 -   CDE under Pure mediation blocks all the harm made by cigarettes.
 
@@ -168,7 +180,7 @@ $NDE = Y|[do(a=1),do(M|do(a=0))] - Y|[do(a=0),do(M|do(a=0))]$
 :::
 
 ::: {.column width="70%"}
-$NDE = Y|[do(M|do(a=0))] - Y|[do(M|do(a=0))] = 0$
+$NDE = Y|[do(M|do(A=0))] - Y|[do(M|do(A=0))] = 0$
 
 -   NDE under Pure mediation also blocks all the harm made by cigarettes by setting the Mediator to the potential outcome that would have been if the patient didn't smoke, while comparing Smoking vs Non-smoking scenario with the manipulated M values.
 
@@ -186,7 +198,7 @@ $NDE = Y|[do(M|do(a=0))] - Y|[do(M|do(a=0))] = 0$
 :::
 
 ::: {.column width="70%"}
-$NIE = Y|[do(a=0),do(M|do(a=1)] - Y|[do(a=0),do(M|do(a=0)]$
+$NIE = Y|[do(A=0),do(M|do(A=1)] - Y|[do(A=0),do(M|do(A=0)]$
 
 -   NIE under Pure mediation contains all the harm made by cigarettes by artificially manipulating the TAR (Mediator) values to the values that would have been if smoking or if not smoking.
 :::
@@ -202,7 +214,7 @@ $NIE = Y|[do(a=0),do(M|do(a=1)] - Y|[do(a=0),do(M|do(a=0)]$
 :::
 
 ::: {.column width="70%"}
-$NIE = Y|[do(M|do(a=1))] - Y|[do(M|do(a=0))]$
+$NIE = Y|[do(M|do(A=1))] - Y|[do(M|do(A=0))]$
 
 -   NIE under Pure mediation contains all the harm made by cigarettes by artificially manipulating the TAR (Mediator) values to the values that would have been if smoking or if not smoking.
 
