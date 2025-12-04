@@ -198,7 +198,7 @@ $NDE = Y|[do(M|do(A=0))] - Y|[do(M|do(A=0))] = 0$
 :::
 
 ::: {.column width="70%"}
-$NIE = Y|[do(A=0),do(M|do(A=1)] - Y|[do(A=0),do(M|do(A=0)]$
+$NIE = Y|[do(A=0),do(M|do(A=1))] - Y|[do(A=0),do(M|do(A=0))]$
 
 -   Under pure mediation, the NIE captures all the harm caused by cigarettes by manipulating TAR (the mediator) to the values it would take under smoking versus not smoking.
 :::
